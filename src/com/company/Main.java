@@ -41,14 +41,12 @@ public class Main
         Collections.sort(down);
         System.out.println(across);
         System.out.println(down);
-        ArrayList<ArrayList<Character>> letters = new ArrayList<>();
+        char[][] letters = new char[100][100];
+        makeBoard(across, down, letters);
+    }
 
-        while(across.size() > 0 || down.size() > 0)
-        {
-            if(across.get(0).connections <= down.get(0).connections)
-            {
+    public static void makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
+    {
 
-            }
-        }
     }
 }
