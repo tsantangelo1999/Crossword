@@ -41,12 +41,138 @@ public class Main
         Collections.sort(down);
         System.out.println(across);
         System.out.println(down);
-        char[][] letters = new char[100][100];
+        char[][] letters = new char[6][5];
+        for(int i = 0; i < letters.length; i++)
+        {
+            for(int j = 0; j < letters[i].length; j++)
+            {
+                letters[i][j] = ' ';
+            }
+        }
+
+        for(int i = 0; i < across.get(0).word.length(); i++)
+        {
+            letters[5][2 + i] = across.get(0).word.charAt(i);
+        }
+        across.remove(0);
+
         makeBoard(across, down, letters);
+
+        for(int i = 0; i < letters.length; i++)
+        {
+            for(int j = 0; j < letters[0].length; j++)
+            {
+                System.out.print(letters[i][j] + " ");
+            }
+            System.out.println();
+        }
     }
 
     public static void makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
     {
+        char[][] tempBoard = c;
+        for(int i = 0; i < a.size(); i++)
+        {
+            Word temp = a.get(i);
+            int index = a.indexOf(temp);
+            a.remove(a.get(i));
+            if(addWord(temp, c, true))
+            {
+                makeBoard(a, d, c);
+                break;
+            }
+            else
+            {
+                a.add(index, temp);
+            }
+        }
+        for(int i = 0; i < d.size(); i++)
+        {
+            Word temp = d.get(i);
+            int index = d.indexOf(temp);
+            d.remove(d.get(i));
+            if(addWord(temp, c, false))
+            {
+                makeBoard(a, d, c);
+                break;
+            }
+            else
+            {
+                d.add(index, temp);
+            }
+        }
+        if(a.size() > 0 || d.size() > 0) //revert changes if no more words fit but words left
+            c = tempBoard;
+    }
 
+    public static boolean addWord(Word w, char[][] c, boolean across) //adds a word to the character array board
+    {
+        char[][] temp = c;
+        for(int i = 0; i < c.length; i++)
+        {
+            for(int j = 0; j < c[0].length; j++)
+            {
+                int index = w.word.indexOf(String.valueOf(c[i][j]));
+                if(index >= 0)
+                {
+                    for(int k = index - 1; k >= 0; k--)
+                    {
+                        if(across)
+                        {
+                            if(c[i][j - index + k] == ' ')
+                            {
+                                c[i][j - index + k] = w.word.charAt(k);
+                            }
+                            else
+                            {
+                                c = temp;
+                                return false;
+                            }
+                        }
+                        if(!across)
+                        {
+                            if(c[i - index + k][j] == ' ')
+                            {
+                                c[i - index + k][j] = w.word.charAt(k);
+                            }
+                            else
+                            {
+                                c = temp;
+                                return false;
+                            }
+                        }
+                    }
+                    for(int k = index + 1; k < w.word.length(); k++)
+                    {
+                        if(across)
+                        {
+                            if(c[i][j - index + k] == ' ')
+                            {
+                                c[i][j - index + k] = w.word.charAt(k);
+                            }
+                            else
+                            {
+                                c = temp;
+                                return false;
+                            }
+                        }
+                        if(!across)
+                        {
+                            if(c[i - index + k][j] == ' ')
+                            {
+                                c[i - index + k][j] = w.word.charAt(k);
+                            }
+                            else
+                            {
+                                c = temp;
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
