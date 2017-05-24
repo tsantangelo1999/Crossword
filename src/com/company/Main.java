@@ -8,6 +8,9 @@ import java.util.Collections;
 
 public class Main
 {
+    public static ArrayList<Word> origAcross;
+    public static ArrayList<Word> origDown;
+
     public static void main(String[] args) throws FileNotFoundException
     {
         JFrame frame = new JFrame("Crossword");
@@ -39,6 +42,8 @@ public class Main
         }
         Collections.sort(across);
         Collections.sort(down);
+        origAcross = deepCopy(across);
+        origDown = deepCopy(down);
         System.out.println(across);
         System.out.println(down);
         char[][] letters = new char[6][5];
@@ -70,7 +75,7 @@ public class Main
 
     public static void makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
     {
-        char[][] tempBoard = c;
+        char[][] tempBoard = deepCopy(c);
         for(int i = 0; i < a.size(); i++)
         {
             Word temp = a.get(i);
@@ -102,12 +107,12 @@ public class Main
             }
         }
         if(a.size() > 0 || d.size() > 0) //revert changes if no more words fit but words left
-            c = tempBoard;
+            System.arraycopy(tempBoard, 0, c, 0, c.length);
     }
 
     public static boolean addWord(Word w, char[][] c, boolean across) //adds a word to the character array board
     {
-        char[][] temp = c;
+        char[][] temp = deepCopy(c);
         for(int i = 0; i < c.length; i++)
         {
             for(int j = 0; j < c[0].length; j++)
@@ -125,7 +130,7 @@ public class Main
                             }
                             else
                             {
-                                c = temp;
+                                System.arraycopy(temp, 0, c, 0, c.length);
                                 return false;
                             }
                         }
@@ -137,7 +142,7 @@ public class Main
                             }
                             else
                             {
-                                c = temp;
+                                System.arraycopy(temp, 0, c, 0, c.length);
                                 return false;
                             }
                         }
@@ -152,7 +157,7 @@ public class Main
                             }
                             else
                             {
-                                c = temp;
+                                System.arraycopy(temp, 0, c, 0, c.length);
                                 return false;
                             }
                         }
@@ -164,15 +169,92 @@ public class Main
                             }
                             else
                             {
-                                c = temp;
+                                System.arraycopy(temp, 0, c, 0, c.length);
                                 return false;
                             }
                         }
                     }
-                    return true;
+                    return checkLegal(c);
                 }
             }
         }
         return false;
+    }
+
+    public static boolean checkLegal(char[][] c) //scan whole board, anytime a leading letter (nothing left and/or above) is found, check if made word is in list
+    {
+        for(int i = 0; i < c.length; i++)
+        {
+            for(int j = 0; j < c[i].length; j++)
+            {
+                if(c[i][j] != ' ' && (j == 0 || c[i][j - 1] == ' ') && !(j == c[i].length - 1 || c[i][j + 1] == ' '))
+                {
+                    String w = compileWord(c, i, j, true);
+                    boolean legal = false;
+                    for(Word word : origAcross)
+                    {
+                        if(w.equalsIgnoreCase(word.word))
+                            legal = true;
+                    }
+                    if(!legal)
+                        return false;
+                }
+                if(c[i][j] != ' ' && (i == 0 || c[i - 1][j] == ' ') && !(i == c.length - 1 || c[i + 1][j] == ' '))
+                {
+                    String w = compileWord(c, i, j, false);
+                    boolean legal = false;
+                    for(Word word : origDown)
+                    {
+                        if(w.equalsIgnoreCase(word.word))
+                            legal = true;
+                    }
+                    if(!legal)
+                        return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public static String compileWord(char[][] c, int i, int j, boolean across)
+    {
+        String word = "";
+        while((i < c.length && j < c[i].length) && c[i][j] != ' ')
+        {
+            if(across)
+            {
+                word += c[i][j];
+                j++;
+            }
+            if(!across)
+            {
+                word += c[i][j];
+                i++;
+            }
+        }
+        return word;
+    }
+
+    public static ArrayList<Word> deepCopy(ArrayList<Word> a)
+    {
+        ArrayList<Word> ret = new ArrayList<>();
+        for(int i = 0; i < a.size(); i++)
+        {
+            ret.add(new Word(a.get(i).word));
+        }
+        return ret;
+    }
+
+    public static char[][] deepCopy(char[][] c)
+    {
+        char[][] ret = new char[c.length][c[0].length];
+        for(int i = 0; i < c.length; i++)
+        {
+            for(int j = 0; j < c[0].length; j++)
+            {
+                ret[i][j] = c[i][j];
+            }
+        }
+        return ret;
     }
 }
