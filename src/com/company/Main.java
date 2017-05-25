@@ -46,7 +46,7 @@ public class Main
         origDown = deepCopy(down);
         System.out.println(across);
         System.out.println(down);
-        char[][] letters = new char[6][5];
+        char[][] letters = new char[9][5];
         for(int i = 0; i < letters.length; i++)
         {
             for(int j = 0; j < letters[i].length; j++)
@@ -57,7 +57,7 @@ public class Main
 
         for(int i = 0; i < across.get(0).word.length(); i++)
         {
-            letters[5][2 + i] = across.get(0).word.charAt(i);
+            letters[8][2 + i] = across.get(0).word.charAt(i);
         }
         across.remove(0);
 
@@ -73,7 +73,7 @@ public class Main
         }
     }
 
-    public static void makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
+    public static boolean makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
     {
         char[][] tempBoard = deepCopy(c);
         for(int i = 0; i < a.size(); i++)
@@ -83,8 +83,8 @@ public class Main
             a.remove(a.get(i));
             if(addWord(temp, c, true))
             {
-                makeBoard(a, d, c);
-                break;
+                if(!makeBoard(a, d, c))
+                    a.add(index, temp);
             }
             else
             {
@@ -98,8 +98,8 @@ public class Main
             d.remove(d.get(i));
             if(addWord(temp, c, false))
             {
-                makeBoard(a, d, c);
-                break;
+                if(!makeBoard(a, d, c))
+                    d.add(index, temp);
             }
             else
             {
@@ -107,7 +107,19 @@ public class Main
             }
         }
         if(a.size() > 0 || d.size() > 0) //revert changes if no more words fit but words left
+        {
             System.arraycopy(tempBoard, 0, c, 0, c.length);
+            return false;
+        }
+        return true;
+
+        /*char[][] board = deepCopy(c);
+        for(int i = 0; i < a.size(); i++)
+        {
+            Word temp = a.get(i);
+            int index = a.indexOf(temp);
+            a.remove(a.get(i));
+        }*/
     }
 
     public static boolean addWord(Word w, char[][] c, boolean across) //adds a word to the character array board
@@ -115,70 +127,89 @@ public class Main
         char[][] temp = deepCopy(c);
         for(int i = 0; i < c.length; i++)
         {
-            for(int j = 0; j < c[0].length; j++)
+            board: for(int j = 0; j < c[0].length; j++)
             {
-                int index = w.word.indexOf(String.valueOf(c[i][j]));
-                if(index >= 0)
+                int count = 0;
+                for(int k = 0; k < w.word.length(); k++)
                 {
-                    for(int k = index - 1; k >= 0; k--)
+                    if(w.word.charAt(k) == c[i][j])
+                        count++;
+                }
+                for(int k = 0; k < count; k++)
+                {
+                    int index = nthIndexOf(k + 1, w.word, c[i][j]);
+                    //int index = w.word.indexOf(String.valueOf(c[i][j]));
+                    if(index >= 0)
                     {
-                        if(across)
+                        for(int l = index - 1; l >= 0; l--)
                         {
-                            if(c[i][j - index + k] == ' ')
+                            if(across)
                             {
-                                c[i][j - index + k] = w.word.charAt(k);
+                                if(j - index + l >= 0 && c[i][j - index + l] == ' ')
+                                {
+                                    c[i][j - index + l] = w.word.charAt(l);
+                                } else
+                                {
+                                    System.arraycopy(temp, 0, c, 0, c.length);
+                                    continue board;
+                                }
                             }
-                            else
+                            if(!across)
                             {
-                                System.arraycopy(temp, 0, c, 0, c.length);
-                                return false;
+                                if(i - index + l >= 0 && c[i - index + l][j] == ' ')
+                                {
+                                    c[i - index + l][j] = w.word.charAt(l);
+                                } else
+                                {
+                                    System.arraycopy(temp, 0, c, 0, c.length);
+                                    continue board;
+                                }
                             }
                         }
-                        if(!across)
+                        for(int l = index + 1; l < w.word.length(); l++)
                         {
-                            if(c[i - index + k][j] == ' ')
+                            if(across)
                             {
-                                c[i - index + k][j] = w.word.charAt(k);
+                                if(j - index + l < c[i].length && c[i][j - index + l] == ' ')
+                                {
+                                    c[i][j - index + l] = w.word.charAt(l);
+                                } else
+                                {
+                                    System.arraycopy(temp, 0, c, 0, c.length);
+                                    continue board;
+                                }
                             }
-                            else
+                            if(!across)
                             {
-                                System.arraycopy(temp, 0, c, 0, c.length);
-                                return false;
+                                if(i - index + l < c.length && c[i - index + l][j] == ' ')
+                                {
+                                    c[i - index + l][j] = w.word.charAt(l);
+                                } else
+                                {
+                                    System.arraycopy(temp, 0, c, 0, c.length);
+                                    continue board;
+                                }
                             }
                         }
+                        return checkLegal(c);
                     }
-                    for(int k = index + 1; k < w.word.length(); k++)
-                    {
-                        if(across)
-                        {
-                            if(c[i][j - index + k] == ' ')
-                            {
-                                c[i][j - index + k] = w.word.charAt(k);
-                            }
-                            else
-                            {
-                                System.arraycopy(temp, 0, c, 0, c.length);
-                                return false;
-                            }
-                        }
-                        if(!across)
-                        {
-                            if(c[i - index + k][j] == ' ')
-                            {
-                                c[i - index + k][j] = w.word.charAt(k);
-                            }
-                            else
-                            {
-                                System.arraycopy(temp, 0, c, 0, c.length);
-                                return false;
-                            }
-                        }
-                    }
-                    return checkLegal(c);
                 }
             }
         }
         return false;
+    }
+    
+    public static int nthIndexOf(int n, String w, char c) //returns index of the nth occurrence
+    {
+        int count = 0;
+        for(int i = 0; i < w.length(); i++)
+        {
+            if(w.charAt(i) == c)
+                count++;
+            if(count == n)
+                return i;
+        }
+        return -1;
     }
 
     public static boolean checkLegal(char[][] c) //scan whole board, anytime a leading letter (nothing left and/or above) is found, check if made word is in list
@@ -216,7 +247,7 @@ public class Main
         return true;
     }
 
-    public static String compileWord(char[][] c, int i, int j, boolean across)
+    public static String compileWord(char[][] c, int i, int j, boolean across) //combines characters starting at i,j to create word for legal check
     {
         String word = "";
         while((i < c.length && j < c[i].length) && c[i][j] != ' ')
@@ -235,7 +266,7 @@ public class Main
         return word;
     }
 
-    public static ArrayList<Word> deepCopy(ArrayList<Word> a)
+    public static ArrayList<Word> deepCopy(ArrayList<Word> a) //creates a deep copy of an arraylist<word>
     {
         ArrayList<Word> ret = new ArrayList<>();
         for(int i = 0; i < a.size(); i++)
@@ -245,7 +276,7 @@ public class Main
         return ret;
     }
 
-    public static char[][] deepCopy(char[][] c)
+    public static char[][] deepCopy(char[][] c) //creates a deep copy of a char[][]
     {
         char[][] ret = new char[c.length][c[0].length];
         for(int i = 0; i < c.length; i++)
