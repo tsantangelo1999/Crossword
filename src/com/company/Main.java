@@ -46,7 +46,7 @@ public class Main
         origDown = deepCopy(down);
         System.out.println(across);
         System.out.println(down);
-        char[][] letters = new char[9][5];
+        char[][] letters = new char[50][50];
         for(int i = 0; i < letters.length; i++)
         {
             for(int j = 0; j < letters[i].length; j++)
@@ -57,17 +57,51 @@ public class Main
 
         for(int i = 0; i < across.get(0).word.length(); i++)
         {
-            letters[8][2 + i] = across.get(0).word.charAt(i);
+            letters[25][25 + i] = across.get(0).word.charAt(i);
         }
         across.remove(0);
 
-        makeBoard(across, down, letters);
+        if(!makeBoard(across, down, letters))
+        {
+            System.out.println("Board could not be made.");
+            System.exit(0);
+        }
 
+        int minWidth = 50;
+        int minHeight = 50;
+        int maxWidth = 0;
+        int maxHeight = 0;
         for(int i = 0; i < letters.length; i++)
         {
-            for(int j = 0; j < letters[0].length; j++)
+            for(int j = 0; j < letters[i].length; j++)
             {
-                System.out.print(letters[i][j] + " ");
+                if(letters[i][j] != ' ')
+                {
+                    if(j < minWidth)
+                        minWidth = j;
+                    if(j > maxWidth)
+                        maxWidth = j;
+                    if(i < minHeight)
+                        minHeight = i;
+                    if(i > maxHeight)
+                        maxHeight = i;
+                }
+            }
+        }
+        char[][] condensedLetters = new char[maxHeight - minHeight + 1][maxWidth - minWidth + 1];
+        for(int i = 0; i < condensedLetters.length; i++)
+        {
+            for(int j = 0; j < condensedLetters[i].length; j++)
+            {
+                condensedLetters[i][j] = letters[i + minHeight][j + minWidth];
+            }
+        }
+
+        for(int i = 0; i < condensedLetters.length; i++)
+        {
+            for(int j = 0; j < condensedLetters[i].length; j++)
+            {
+                System.out.print(condensedLetters[i][j] + " ");
             }
             System.out.println();
         }
@@ -75,128 +109,144 @@ public class Main
 
     public static boolean makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
     {
-        char[][] tempBoard = deepCopy(c);
-        for(int i = 0; i < a.size(); i++)
+        char[][] board = deepCopy(c);
+        top:
+        for(int h = 0; h < a.size(); h++)
         {
-            Word temp = a.get(i);
-            int index = a.indexOf(temp);
-            a.remove(a.get(i));
-            if(addWord(temp, c, true))
+            Word temp = a.get(h);
+            int wordIndex = a.indexOf(temp);
+            a.remove(a.get(h));
+            for(int i = 0; i < c.length; i++)
             {
-                if(!makeBoard(a, d, c))
-                    a.add(index, temp);
-            }
-            else
-            {
-                a.add(index, temp);
-            }
-        }
-        for(int i = 0; i < d.size(); i++)
-        {
-            Word temp = d.get(i);
-            int index = d.indexOf(temp);
-            d.remove(d.get(i));
-            if(addWord(temp, c, false))
-            {
-                if(!makeBoard(a, d, c))
-                    d.add(index, temp);
-            }
-            else
-            {
-                d.add(index, temp);
-            }
-        }
-        if(a.size() > 0 || d.size() > 0) //revert changes if no more words fit but words left
-        {
-            System.arraycopy(tempBoard, 0, c, 0, c.length);
-            return false;
-        }
-        return true;
-
-        /*char[][] board = deepCopy(c);
-        for(int i = 0; i < a.size(); i++)
-        {
-            Word temp = a.get(i);
-            int index = a.indexOf(temp);
-            a.remove(a.get(i));
-        }*/
-    }
-
-    public static boolean addWord(Word w, char[][] c, boolean across) //adds a word to the character array board
-    {
-        char[][] temp = deepCopy(c);
-        for(int i = 0; i < c.length; i++)
-        {
-            board: for(int j = 0; j < c[0].length; j++)
-            {
-                int count = 0;
-                for(int k = 0; k < w.word.length(); k++)
+                board:
+                for(int j = 0; j < c[0].length; j++)
                 {
-                    if(w.word.charAt(k) == c[i][j])
-                        count++;
-                }
-                for(int k = 0; k < count; k++)
-                {
-                    int index = nthIndexOf(k + 1, w.word, c[i][j]);
-                    //int index = w.word.indexOf(String.valueOf(c[i][j]));
-                    if(index >= 0)
+                    int count = 0;
+                    for(int k = 0; k < temp.word.length(); k++)
                     {
+                        if(temp.word.charAt(k) == c[i][j])
+                            count++;
+                    }
+                    for(int k = 0; k < count; k++)
+                    {
+                        int index = nthIndexOf(k + 1, temp.word, c[i][j]);
                         for(int l = index - 1; l >= 0; l--)
                         {
-                            if(across)
+                            if(j - index + l >= 0 && c[i][j - index + l] == ' ')
                             {
-                                if(j - index + l >= 0 && c[i][j - index + l] == ' ')
-                                {
-                                    c[i][j - index + l] = w.word.charAt(l);
-                                } else
-                                {
-                                    System.arraycopy(temp, 0, c, 0, c.length);
-                                    continue board;
-                                }
+                                c[i][j - index + l] = temp.word.charAt(l);
                             }
-                            if(!across)
+                            else
                             {
-                                if(i - index + l >= 0 && c[i - index + l][j] == ' ')
-                                {
-                                    c[i - index + l][j] = w.word.charAt(l);
-                                } else
-                                {
-                                    System.arraycopy(temp, 0, c, 0, c.length);
-                                    continue board;
-                                }
+                                System.arraycopy(board, 0, c, 0, c.length);
+                                board = deepCopy(c);
+                                continue board;
                             }
                         }
-                        for(int l = index + 1; l < w.word.length(); l++)
+                        for(int l = index + 1; l < temp.word.length(); l++)
                         {
-                            if(across)
+                            if(j - index + l < c[i].length && c[i][j - index + l] == ' ')
                             {
-                                if(j - index + l < c[i].length && c[i][j - index + l] == ' ')
-                                {
-                                    c[i][j - index + l] = w.word.charAt(l);
-                                } else
-                                {
-                                    System.arraycopy(temp, 0, c, 0, c.length);
-                                    continue board;
-                                }
+                                c[i][j - index + l] = temp.word.charAt(l);
                             }
-                            if(!across)
+                            else
                             {
-                                if(i - index + l < c.length && c[i - index + l][j] == ' ')
-                                {
-                                    c[i - index + l][j] = w.word.charAt(l);
-                                } else
-                                {
-                                    System.arraycopy(temp, 0, c, 0, c.length);
-                                    continue board;
-                                }
+                                System.arraycopy(board, 0, c, 0, c.length);
+                                board = deepCopy(c);
+                                continue board;
                             }
                         }
-                        return checkLegal(c);
+                        if(checkLegal(c))
+                            if(makeBoard(a, d, c))
+                                break top;
+                            else
+                            {
+                                System.arraycopy(board, 0, c, 0, c.length);
+                                board = deepCopy(c);
+                            }
+                        else
+                        {
+                            System.arraycopy(board, 0, c, 0, c.length);
+                            board = deepCopy(c);
+                        }
                     }
                 }
             }
+            a.add(wordIndex, temp);
         }
-        return false;
+
+        top:
+        for(int h = 0; h < d.size(); h++)
+        {
+            Word temp = d.get(h);
+            int wordIndex = d.indexOf(temp);
+            d.remove(d.get(h));
+            for(int i = 0; i < c.length; i++)
+            {
+                board:
+                for(int j = 0; j < c[0].length; j++)
+                {
+                    int count = 0;
+                    for(int k = 0; k < temp.word.length(); k++)
+                    {
+                        if(temp.word.charAt(k) == c[i][j])
+                            count++;
+                    }
+                    for(int k = 0; k < count; k++)
+                    {
+                        int index = nthIndexOf(k + 1, temp.word, c[i][j]);
+                        for(int l = index - 1; l >= 0; l--)
+                        {
+                            if(i - index + l >= 0 && c[i - index + l][j] == ' ')
+                            {
+                                c[i - index + l][j] = temp.word.charAt(l);
+                            }
+                            else
+                            {
+                                System.arraycopy(board, 0, c, 0, c.length);
+                                board = deepCopy(c);
+                                continue board;
+                            }
+                        }
+                        for(int l = index + 1; l < temp.word.length(); l++)
+                        {
+                            if(i - index + l < c.length && c[i - index + l][j] == ' ')
+                            {
+                                c[i - index + l][j] = temp.word.charAt(l);
+                            }
+                            else
+                            {
+                                System.arraycopy(board, 0, c, 0, c.length);
+                                board = deepCopy(c);
+                                continue board;
+                            }
+                        }
+                        if(checkLegal(c))
+                            if(makeBoard(a, d, c))
+                                break top;
+                            else
+                            {
+                                System.arraycopy(board, 0, c, 0, c.length);
+                                board = deepCopy(c);
+                            }
+                        else
+                        {
+                            System.arraycopy(board, 0, c, 0, c.length);
+                            board = deepCopy(c);
+                        }
+                    }
+                }
+            }
+            d.add(wordIndex, temp);
+        }
+
+        if(a.size() > 0 || d.size() > 0) //revert changes if no more words fit but words left
+        {
+            System.arraycopy(board, 0, c, 0, c.length);
+            return false;
+        }
+
+        return true;
     }
     
     public static int nthIndexOf(int n, String w, char c) //returns index of the nth occurrence
