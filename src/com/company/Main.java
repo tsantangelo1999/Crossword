@@ -1,6 +1,6 @@
 package com.company;
 
-import javax.swing.JFrame;
+import javax.swing.*;
 import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ public class Main
 
     public static void main(String[] args) throws FileNotFoundException
     {
-        JFrame frame = new JFrame("Crossword");
         Board board = new Board();
         File file = new File("words.txt");
         Scanner sc = new Scanner(file);
@@ -105,6 +104,12 @@ public class Main
             }
             System.out.println();
         }
+
+        JFrame frame = new JFrame("Crossword");
+        frame.setSize(350, 200);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JPanel panel = new JPanel();
+        frame.setVisible(true);
     }
 
     public static boolean makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
@@ -118,7 +123,6 @@ public class Main
             a.remove(a.get(h));
             for(int i = 0; i < c.length; i++)
             {
-                board:
                 for(int j = 0; j < c[0].length; j++)
                 {
                     int count = 0;
@@ -127,6 +131,7 @@ public class Main
                         if(temp.word.charAt(k) == c[i][j])
                             count++;
                     }
+                    board:
                     for(int k = 0; k < count; k++)
                     {
                         int index = nthIndexOf(k + 1, temp.word, c[i][j]);
@@ -183,7 +188,6 @@ public class Main
             d.remove(d.get(h));
             for(int i = 0; i < c.length; i++)
             {
-                board:
                 for(int j = 0; j < c[0].length; j++)
                 {
                     int count = 0;
@@ -192,6 +196,7 @@ public class Main
                         if(temp.word.charAt(k) == c[i][j])
                             count++;
                     }
+                    board:
                     for(int k = 0; k < count; k++)
                     {
                         int index = nthIndexOf(k + 1, temp.word, c[i][j]);
