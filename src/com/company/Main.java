@@ -1,6 +1,7 @@
 package com.company;
 
 import javax.swing.*;
+import javax.swing.text.MaskFormatter;
 import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -10,10 +11,11 @@ public class Main
 {
     public static ArrayList<Word> origAcross;
     public static ArrayList<Word> origDown;
+    public static JFrame frame;
+    public static JPanel panel;
 
     public static void main(String[] args) throws FileNotFoundException
     {
-        Board board = new Board();
         File file = new File("words.txt");
         Scanner sc = new Scanner(file);
         ArrayList<Word> across = new ArrayList<>();
@@ -96,19 +98,17 @@ public class Main
             }
         }
 
-        for(int i = 0; i < condensedLetters.length; i++)
-        {
-            for(int j = 0; j < condensedLetters[i].length; j++)
-            {
-                System.out.print(condensedLetters[i][j] + " ");
-            }
-            System.out.println();
-        }
+        frame = new JFrame("Crossword");
+        panel = new JPanel();
+        panel.setLayout(null);
 
-        JFrame frame = new JFrame("Crossword");
-        frame.setSize(350, 200);
+        Board board = new Board(condensedLetters);
+        System.out.println(board);
+
+        frame.add(panel);
+
+        frame.setSize(80 + condensedLetters[0].length * 40, 80 + condensedLetters.length * 40);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        JPanel panel = new JPanel();
         frame.setVisible(true);
     }
 
@@ -342,5 +342,20 @@ public class Main
             }
         }
         return ret;
+    }
+
+    public static MaskFormatter createFormatter(String s)
+    {
+        MaskFormatter formatter = null;
+        try
+        {
+            formatter = new MaskFormatter(s);
+        }
+        catch(java.text.ParseException e)
+        {
+            System.out.println("no gud");
+            System.exit(-1);
+        }
+        return formatter;
     }
 }
