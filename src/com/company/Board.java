@@ -18,7 +18,7 @@ public class Board
                 }
                 else
                 {
-                    if((i == 0 || chars[i - 1][j] == ' ') || (j == 0 || chars[i][j - 1] == ' '))
+                    if(((i == 0 || chars[i - 1][j] == ' ') && (i < board.length - 1 && chars[i + 1][j] != ' ')) || ((j == 0 || chars[i][j - 1] == ' ') && (j < board[i].length - 1 && chars[i][j + 1] != ' ')))
                     {
                         board[i][j] = new SquareFillable(j, i, chars[i][j], num);
                         num++;
