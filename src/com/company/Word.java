@@ -5,12 +5,14 @@ import java.util.ArrayList;
 public class Word implements Comparable<Word>
 {
     public final String word;
+    public final String clue;
 
     public int connections;
 
-    public Word(String w)
+    public Word(String w, String c)
     {
         word = w;
+        clue = c;
         connections = 0;
     }
 

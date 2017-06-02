@@ -21,16 +21,25 @@ public class Main
         ArrayList<Word> across = new ArrayList<>();
         ArrayList<Word> down = new ArrayList<>();
         boolean acrossDone = false;
+        sc.useDelimiter("\t|\n");
         while(sc.hasNextLine())
         {
             if(!acrossDone)
-                across.add(new Word(sc.nextLine()));
-            else
-                down.add(new Word(sc.nextLine()));
-            if(across.get(across.size() - 1).word.equalsIgnoreCase(""))
             {
-                acrossDone = true;
-                across.remove(across.size() - 1);
+                String word = sc.next();
+                if(word.equalsIgnoreCase(""))
+                {
+                    acrossDone = true;
+                    continue;
+                }
+                String clue = sc.next();
+                across.add(new Word(word, clue));
+            }
+            else
+            {
+                String word = sc.next();
+                String clue = sc.next();
+                down.add(new Word(word, clue));
             }
         }
         for(Word w : across)
@@ -107,7 +116,7 @@ public class Main
 
         frame.add(panel);
 
-        frame.setSize(80 + condensedLetters[0].length * 40, 80 + condensedLetters.length * 40);
+        frame.setSize(60 + condensedLetters[0].length * 30, 60 + condensedLetters.length * 30);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
@@ -326,7 +335,7 @@ public class Main
         ArrayList<Word> ret = new ArrayList<>();
         for(int i = 0; i < a.size(); i++)
         {
-            ret.add(new Word(a.get(i).word));
+            ret.add(new Word(a.get(i).word, a.get(i).clue));
         }
         return ret;
     }

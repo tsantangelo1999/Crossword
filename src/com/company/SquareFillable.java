@@ -11,7 +11,7 @@ public class SquareFillable extends Square
     public SquareFillable(int x, int y, char s)
     {
         JFormattedTextField textField = new JFormattedTextField(Main.createFormatter("U"));
-        textField.setBounds(40 + x * 40, 40 + y * 40, 30, 30);
+        textField.setBounds(30 + x * 30, 30 + y * 30, 30, 30);
         textField.setHorizontalAlignment(JFormattedTextField.CENTER);
         Main.panel.add(textField);
         letter = 32;
@@ -21,11 +21,11 @@ public class SquareFillable extends Square
     public SquareFillable(int x, int y, char s, int n)
     {
         JFormattedTextField textField = new JFormattedTextField(Main.createFormatter("U"));
-        textField.setBounds(40 + x * 40, 40 + y * 40, 30, 30);
+        textField.setBounds(30 + x * 30, 30 + y * 30, 30, 30);
         textField.setHorizontalAlignment(JFormattedTextField.CENTER);
         JLabel label = new JLabel(String.valueOf(n));
         label.setSize(10, 10);
-        label.setBounds(30 + x * 40, 40 + y * 40, 10, 10);
+        label.setBounds(20 + x * 30, 20 + y * 30, 20 * String.valueOf(num).length(), 20);
         Main.panel.add(textField);
         Main.panel.add(label);
         letter = 32;
