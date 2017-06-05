@@ -2,6 +2,8 @@ package com.company;
 
 import javax.swing.*;
 import javax.swing.text.MaskFormatter;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -11,8 +13,13 @@ public class Main
 {
     public static ArrayList<Word> origAcross;
     public static ArrayList<Word> origDown;
+    public static ArrayList<Clue> clueAcross;
+    public static ArrayList<Clue> clueDown;
+    public static Board board;
     public static JFrame frame;
     public static JPanel panel;
+    public static JLabel[] clues;
+    public static JButton checkAnswers;
 
     public static void main(String[] args) throws FileNotFoundException
     {
@@ -107,16 +114,87 @@ public class Main
             }
         }
 
+        int maxClueSize = 0;
+        for(Word w : origAcross)
+        {
+            if(w.clue.length() > maxClueSize)
+                maxClueSize = w.clue.length();
+        }
+        for(Word w : origDown)
+        {
+            if(w.clue.length() > maxClueSize)
+                maxClueSize = w.clue.length();
+        }
+
         frame = new JFrame("Crossword");
         panel = new JPanel();
         panel.setLayout(null);
+        checkAnswers = new JButton(new action())
 
-        Board board = new Board(condensedLetters);
+        board = new Board(condensedLetters);
         System.out.println(board);
+
+        clueAcross = new ArrayList<>();
+        clueDown = new ArrayList<>();
+        for(int i = 0; i < board.board.length; i++)
+        {
+            for(int j = 0; j < board.board[i].length; j++)
+            {
+                if(board.board[i][j] instanceof SquareFillable && board.board[i][j].num != 0)
+                {
+                    String s1 = compileWord(condensedLetters, i, j, true);
+                    String s2 = compileWord(condensedLetters, i, j, false);
+                    if(s1.length() > 1)
+                    {
+                        for(Word w : origAcross)
+                        {
+                            if(w.word.equalsIgnoreCase(s1))
+                                clueAcross.add(new Clue(board.board[i][j].num, w.clue));
+                        }
+                    }
+                    if(s2.length() > 1)
+                    {
+                        for(Word w : origDown)
+                        {
+                            if(w.word.equalsIgnoreCase(s2))
+                                clueDown.add(new Clue(board.board[i][j].num, w.clue));
+                        }
+                    }
+                }
+            }
+        }
+
+        String label = "Across:\n";
+        for(Clue c : clueAcross)
+        {
+            label += c.num + ": " + c.clue + "\n";
+        }
+        label += "Down:";
+        for(Clue c : clueDown)
+        {
+            label += "\n" + c.num + ": " + c.clue;
+        }
+
+        clues = new JLabel[2 + origAcross.size() + origDown.size()];
+        clues[0] = new JLabel("Across:");
+        clues[0].setBounds(60 + condensedLetters[0].length * 30 + 60, 60, maxClueSize * 8, 15);
+        panel.add(clues[0]);
+        for(int i = 1; i < clues.length; i++)
+        {
+            if(i <= clueAcross.size())
+                clues[i] = new JLabel(clueAcross.get(i - 1).num + ": " + clueAcross.get(i - 1).clue);
+            else if(i == clueAcross.size() + 1)
+                clues[i] = new JLabel("Down: ");
+            else
+                clues[i] = new JLabel(clueDown.get(i - clueAcross.size() - 2).num + ": " + clueDown.get(i - clueAcross.size() - 2).clue);
+            clues[i].setBounds(60 + condensedLetters[0].length * 30 + 60, 60 + i * 15, maxClueSize * 8, 15);
+            panel.add(clues[i]);
+        }
+
 
         frame.add(panel);
 
-        frame.setSize(60 + condensedLetters[0].length * 30, 60 + condensedLetters.length * 30);
+        frame.setSize(60 + condensedLetters[0].length * 30 + 60 + maxClueSize * 8, 60 + condensedLetters.length * 30 + 60);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
@@ -366,5 +444,13 @@ public class Main
             System.exit(-1);
         }
         return formatter;
+    }
+
+    public static class action implements ActionListener
+    {
+        public void actionPerformed(ActionEvent ae)
+        {
+
+        }
     }
 }

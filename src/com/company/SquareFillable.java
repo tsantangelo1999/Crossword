@@ -1,26 +1,27 @@
 package com.company;
 
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class SquareFillable extends Square
 {
-    int num;
-    char letter;
-    char letterSolution;
+    private JFormattedTextField textField;
 
     public SquareFillable(int x, int y, char s)
     {
-        JFormattedTextField textField = new JFormattedTextField(Main.createFormatter("U"));
+        textField = new JFormattedTextField(Main.createFormatter("U"));
         textField.setBounds(30 + x * 30, 30 + y * 30, 30, 30);
         textField.setHorizontalAlignment(JFormattedTextField.CENTER);
         Main.panel.add(textField);
         letter = 32;
         letterSolution = s;
+        num = 0;
     }
 
     public SquareFillable(int x, int y, char s, int n)
     {
-        JFormattedTextField textField = new JFormattedTextField(Main.createFormatter("U"));
+        textField = new JFormattedTextField(Main.createFormatter("U"));
         textField.setBounds(30 + x * 30, 30 + y * 30, 30, 30);
         textField.setHorizontalAlignment(JFormattedTextField.CENTER);
         JLabel label = new JLabel(String.valueOf(n));
@@ -36,5 +37,10 @@ public class SquareFillable extends Square
     public String toString()
     {
         return String.valueOf(letterSolution);
+    }
+
+    public void update()
+    {
+        letter = textField.getText().charAt(0);
     }
 }
