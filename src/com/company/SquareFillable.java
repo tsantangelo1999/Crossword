@@ -6,8 +6,6 @@ import java.awt.event.ActionListener;
 
 public class SquareFillable extends Square
 {
-    private JFormattedTextField textField;
-
     public SquareFillable(int x, int y, char s)
     {
         textField = new JFormattedTextField(Main.createFormatter("U"));
@@ -37,10 +35,5 @@ public class SquareFillable extends Square
     public String toString()
     {
         return String.valueOf(letterSolution);
-    }
-
-    public void update()
-    {
-        letter = textField.getText().charAt(0);
     }
 }

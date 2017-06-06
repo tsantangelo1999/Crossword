@@ -18,6 +18,7 @@ public class Main
     public static Board board;
     public static JFrame frame;
     public static JPanel panel;
+    public static JLabel result;
     public static JLabel[] clues;
     public static JButton checkAnswers;
 
@@ -129,7 +130,13 @@ public class Main
         frame = new JFrame("Crossword");
         panel = new JPanel();
         panel.setLayout(null);
-        checkAnswers = new JButton(new action())
+        checkAnswers = new JButton("Check");
+        checkAnswers.addActionListener(new action());
+        checkAnswers.setBounds(30, 30 + condensedLetters.length * 30 + 30, 75, 30);
+        result = new JLabel("");
+        result.setBounds(120, 30 + condensedLetters.length * 30 + 30, 60, 30);
+        panel.add(result);
+        panel.add(checkAnswers);
 
         board = new Board(condensedLetters);
         System.out.println(board);
@@ -177,7 +184,7 @@ public class Main
 
         clues = new JLabel[2 + origAcross.size() + origDown.size()];
         clues[0] = new JLabel("Across:");
-        clues[0].setBounds(60 + condensedLetters[0].length * 30 + 60, 60, maxClueSize * 8, 15);
+        clues[0].setBounds(30 + condensedLetters[0].length * 30 + 30, 60, (maxClueSize + 3) * 10, 15);
         panel.add(clues[0]);
         for(int i = 1; i < clues.length; i++)
         {
@@ -187,14 +194,14 @@ public class Main
                 clues[i] = new JLabel("Down: ");
             else
                 clues[i] = new JLabel(clueDown.get(i - clueAcross.size() - 2).num + ": " + clueDown.get(i - clueAcross.size() - 2).clue);
-            clues[i].setBounds(60 + condensedLetters[0].length * 30 + 60, 60 + i * 15, maxClueSize * 8, 15);
+            clues[i].setBounds(30 + condensedLetters[0].length * 30 + 30, 60 + i * 15, (maxClueSize + 3) * 10, 15);
             panel.add(clues[i]);
         }
 
 
         frame.add(panel);
 
-        frame.setSize(60 + condensedLetters[0].length * 30 + 60 + maxClueSize * 8, 60 + condensedLetters.length * 30 + 60);
+        frame.setSize(30 + condensedLetters[0].length * 30 + 30 + (maxClueSize + 3) * 10, 30 + condensedLetters.length * 30 + 90);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
@@ -450,7 +457,17 @@ public class Main
     {
         public void actionPerformed(ActionEvent ae)
         {
-
+            for(Square[] row : board.board)
+                for(Square s : row)
+                {
+                    s.update();
+                    if(s.letter != s.letterSolution)
+                    {
+                        result.setText("Incorrect");
+                        return;
+                    }
+                }
+            result.setText("Correct");
         }
     }
 }
