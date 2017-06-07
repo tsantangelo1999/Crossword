@@ -35,11 +35,11 @@ public class Board
     public String toString() //print out the completed solution board in grid format to console
     {
         String ret = "";
-        for(int i = 0; i < board.length; i++)
+        for(Square[] sA : board)
         {
-            for(int j = 0; j < board[i].length; j++)
+            for(Square s : sA)
             {
-                ret += board[i][j] + " ";
+                ret += s + " ";
             }
             ret += "\n";
         }
