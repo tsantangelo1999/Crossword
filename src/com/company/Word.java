@@ -16,7 +16,7 @@ public class Word implements Comparable<Word>
         connections = 0;
     }
 
-    public int compareTo(Word word1)
+    public int compareTo(Word word1) //used for sorting the word arraylists in ascending connection order
     {
         if(connections < word1.connections)
             return -1;
@@ -26,7 +26,7 @@ public class Word implements Comparable<Word>
             return 0;
     }
 
-    public void countConnections(ArrayList<Word> words)
+    public void countConnections(ArrayList<Word> words) //finds the amount of words in the passed arraylist that share a common letter with this word
     {
         top: for(Word w : words)
         {

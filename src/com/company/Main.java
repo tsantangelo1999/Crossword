@@ -30,7 +30,7 @@ public class Main
         ArrayList<Word> down = new ArrayList<>();
         boolean acrossDone = false;
         sc.useDelimiter("\t|\n");
-        while(sc.hasNextLine())
+        while(sc.hasNextLine()) //Populate across and down arraylists with word objects
         {
             if(!acrossDone)
             {
@@ -52,7 +52,7 @@ public class Main
         }
         for(Word w : across)
         {
-            w.countConnections(down);
+            w.countConnections(down); //countConnections aids in efficiency by placing the words with the least connections first
         }
         for(Word w : down)
         {
@@ -60,26 +60,26 @@ public class Main
         }
         Collections.sort(across);
         Collections.sort(down);
-        origAcross = deepCopy(across);
+        origAcross = deepCopy(across); //static arraylists useful in method calls and also for unmodified versions
         origDown = deepCopy(down);
-        System.out.println(across);
+        System.out.println(across); //debug feature useful for seeing all of the words and number of connections
         System.out.println(down);
-        char[][] letters = new char[50][50];
+        char[][] letters = new char[50][50]; //max board size is 50x50, if board cannot fit in there, board fails to be created
         for(int i = 0; i < letters.length; i++)
         {
             for(int j = 0; j < letters[i].length; j++)
             {
-                letters[i][j] = ' ';
+                letters[i][j] = ' '; //initialize all indices of letters[][] to a space
             }
         }
 
         for(int i = 0; i < across.get(0).word.length(); i++)
         {
-            letters[25][25 + i] = across.get(0).word.charAt(i);
+            letters[25][25 + i] = across.get(0).word.charAt(i); //place first word of across wordlist at center of board, required as makeBoard method builds from existing words
         }
-        across.remove(0);
+        across.remove(0); //remove first word from list so that it is not placed again
 
-        if(!makeBoard(across, down, letters))
+        if(!makeBoard(across, down, letters)) //makes the board, and if it fails, exits the program
         {
             System.out.println("Board could not be made.");
             System.exit(0);
@@ -89,7 +89,7 @@ public class Main
         int minHeight = 50;
         int maxWidth = 0;
         int maxHeight = 0;
-        for(int i = 0; i < letters.length; i++)
+        for(int i = 0; i < letters.length; i++) //finds the size of the board so that it can be condensed
         {
             for(int j = 0; j < letters[i].length; j++)
             {
@@ -107,7 +107,7 @@ public class Main
             }
         }
         char[][] condensedLetters = new char[maxHeight - minHeight + 1][maxWidth - minWidth + 1];
-        for(int i = 0; i < condensedLetters.length; i++)
+        for(int i = 0; i < condensedLetters.length; i++) //condenses the board so no empty space exists on the edges
         {
             for(int j = 0; j < condensedLetters[i].length; j++)
             {
@@ -115,7 +115,7 @@ public class Main
             }
         }
 
-        int maxClueSize = 0;
+        int maxClueSize = 0; //max clue size necessary for JFrame clue display
         for(Word w : origAcross)
         {
             if(w.clue.length() > maxClueSize)
@@ -131,26 +131,26 @@ public class Main
         panel = new JPanel();
         panel.setLayout(null);
         checkAnswers = new JButton("Check");
-        checkAnswers.addActionListener(new action());
+        checkAnswers.addActionListener(new action()); //action() updates the letters of each Square object when called and updates the result JLabel
         checkAnswers.setBounds(30, 30 + condensedLetters.length * 30 + 30, 75, 30);
         result = new JLabel("");
         result.setBounds(120, 30 + condensedLetters.length * 30 + 30, 60, 30);
         panel.add(result);
         panel.add(checkAnswers);
 
-        board = new Board(condensedLetters);
+        board = new Board(condensedLetters); //create the board object
         System.out.println(board);
 
         clueAcross = new ArrayList<>();
         clueDown = new ArrayList<>();
-        for(int i = 0; i < board.board.length; i++)
+        for(int i = 0; i < board.board.length; i++) //creates the clues arraylists
         {
             for(int j = 0; j < board.board[i].length; j++)
             {
-                if(board.board[i][j] instanceof SquareFillable && board.board[i][j].num != 0)
+                if(board.board[i][j] instanceof SquareFillable && board.board[i][j].num != 0) //check for leading boxes (boxes with numbers)
                 {
-                    String s1 = compileWord(condensedLetters, i, j, true);
-                    String s2 = compileWord(condensedLetters, i, j, false);
+                    String s1 = compileWord(condensedLetters, i, j, true); //make word across
+                    String s2 = compileWord(condensedLetters, i, j, false); //make word down
                     if(s1.length() > 1)
                     {
                         for(Word w : origAcross)
@@ -171,22 +171,11 @@ public class Main
             }
         }
 
-        String label = "Across:\n";
-        for(Clue c : clueAcross)
-        {
-            label += c.num + ": " + c.clue + "\n";
-        }
-        label += "Down:";
-        for(Clue c : clueDown)
-        {
-            label += "\n" + c.num + ": " + c.clue;
-        }
-
         clues = new JLabel[2 + origAcross.size() + origDown.size()];
         clues[0] = new JLabel("Across:");
         clues[0].setBounds(30 + condensedLetters[0].length * 30 + 30, 60, (maxClueSize + 3) * 10, 15);
         panel.add(clues[0]);
-        for(int i = 1; i < clues.length; i++)
+        for(int i = 1; i < clues.length; i++) //sequentially place the clues into JLabels on the board
         {
             if(i <= clueAcross.size())
                 clues[i] = new JLabel(clueAcross.get(i - 1).num + ": " + clueAcross.get(i - 1).clue);
@@ -203,16 +192,16 @@ public class Main
 
         frame.setSize(30 + condensedLetters[0].length * 30 + 30 + (maxClueSize + 3) * 10, 30 + condensedLetters.length * 30 + 90);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setVisible(true);
+        frame.setVisible(true); //make that sweet sweet window pop open so you can actually do the crossword
     }
 
     public static boolean makeBoard(ArrayList<Word> a, ArrayList<Word> d, char[][] c) //place word, then next word, so on, if word fails to place, back up one step
     {
-        char[][] board = deepCopy(c);
+        char[][] board = deepCopy(c); //make a deep copy of the current board
         top:
-        for(int h = 0; h < a.size(); h++)
+        for(int h = 0; h < a.size(); h++) //iterate through across words
         {
-            Word temp = a.get(h);
+            Word temp = a.get(h); //temporarily pull the current word out of the arraylist
             int wordIndex = a.indexOf(temp);
             a.remove(a.get(h));
             for(int i = 0; i < c.length; i++)
@@ -220,7 +209,7 @@ public class Main
                 for(int j = 0; j < c[0].length; j++)
                 {
                     int count = 0;
-                    for(int k = 0; k < temp.word.length(); k++)
+                    for(int k = 0; k < temp.word.length(); k++) //find the amount of instances that the character at i,j appears in word
                     {
                         if(temp.word.charAt(k) == c[i][j])
                             count++;
@@ -228,25 +217,25 @@ public class Main
                     board:
                     for(int k = 0; k < count; k++)
                     {
-                        int index = nthIndexOf(k + 1, temp.word, c[i][j]);
+                        int index = nthIndexOf(k + 1, temp.word, c[i][j]); //find the nth of the letter at i,j in word
                         for(int l = index - 1; l >= 0; l--)
                         {
-                            if(j - index + l >= 0 && c[i][j - index + l] == ' ')
+                            if(j - index + l >= 0 && (c[i][j - index + l] == ' ' || c[i][j - index + l] == temp.word.charAt(l)))
                             {
-                                c[i][j - index + l] = temp.word.charAt(l);
+                                c[i][j - index + l] = temp.word.charAt(l); //move from index - 1 to the left and place letters
                             }
                             else
                             {
-                                System.arraycopy(board, 0, c, 0, c.length);
-                                board = deepCopy(c);
-                                continue board;
+                                System.arraycopy(board, 0, c, 0, c.length); //if it hits a word or the edge, reset the board to before modifications were made
+                                board = deepCopy(c); //make a new deepcopy again
+                                continue board; //continue iteration trying more possibilities
                             }
                         }
                         for(int l = index + 1; l < temp.word.length(); l++)
                         {
-                            if(j - index + l < c[i].length && c[i][j - index + l] == ' ')
+                            if(j - index + l < c[i].length && (c[i][j - index + l] == ' ' || c[i][j - index + l] == temp.word.charAt(l)))
                             {
-                                c[i][j - index + l] = temp.word.charAt(l);
+                                c[i][j - index + l] = temp.word.charAt(l); //same as before but starting at index + 1 and going right
                             }
                             else
                             {
@@ -255,27 +244,27 @@ public class Main
                                 continue board;
                             }
                         }
-                        if(checkLegal(c))
-                            if(makeBoard(a, d, c))
-                                break top;
+                        if(checkLegal(c)) //make sure the letters placed didnt lie adjacent to other letters making nonsense words
+                            if(makeBoard(a, d, c)) //recursive call
+                                break top; //if calling chain is returning true, break because we did it
                             else
                             {
-                                System.arraycopy(board, 0, c, 0, c.length);
+                                System.arraycopy(board, 0, c, 0, c.length); //if it done goofed, reset board to layout at start of this particular method call and continue iterating
                                 board = deepCopy(c);
                             }
                         else
                         {
-                            System.arraycopy(board, 0, c, 0, c.length);
+                            System.arraycopy(board, 0, c, 0, c.length); //if placement was not legal, reset board to original layout and continue trying
                             board = deepCopy(c);
                         }
                     }
                 }
             }
-            a.add(wordIndex, temp);
+            a.add(wordIndex, temp); //readd the current word to the arraylist, as the loop finished its iteration without a recursive call
         }
 
         top:
-        for(int h = 0; h < d.size(); h++)
+        for(int h = 0; h < d.size(); h++) //exact same as before but with down words instead of across words
         {
             Word temp = d.get(h);
             int wordIndex = d.indexOf(temp);
@@ -296,7 +285,7 @@ public class Main
                         int index = nthIndexOf(k + 1, temp.word, c[i][j]);
                         for(int l = index - 1; l >= 0; l--)
                         {
-                            if(i - index + l >= 0 && c[i - index + l][j] == ' ')
+                            if(i - index + l >= 0 && (c[i - index + l][j] == ' ' || c[i - index + l][j] == temp.word.charAt(l)))
                             {
                                 c[i - index + l][j] = temp.word.charAt(l);
                             }
@@ -309,7 +298,7 @@ public class Main
                         }
                         for(int l = index + 1; l < temp.word.length(); l++)
                         {
-                            if(i - index + l < c.length && c[i - index + l][j] == ' ')
+                            if(i - index + l < c.length && (c[i - index + l][j] == ' ' || c[i - index + l][j] == temp.word.charAt(l)))
                             {
                                 c[i - index + l][j] = temp.word.charAt(l);
                             }
@@ -367,19 +356,19 @@ public class Main
         {
             for(int j = 0; j < c[i].length; j++)
             {
-                if(c[i][j] != ' ' && (j == 0 || c[i][j - 1] == ' ') && !(j == c[i].length - 1 || c[i][j + 1] == ' '))
+                if(c[i][j] != ' ' && (j == 0 || c[i][j - 1] == ' ') && !(j == c[i].length - 1 || c[i][j + 1] == ' ')) //check for leading letter across
                 {
-                    String w = compileWord(c, i, j, true);
+                    String w = compileWord(c, i, j, true); //makes the word starting at i,j and moving right
                     boolean legal = false;
                     for(Word word : origAcross)
                     {
-                        if(w.equalsIgnoreCase(word.word))
+                        if(w.equalsIgnoreCase(word.word)) //check every word in original across list and if it matches one, board is still legal
                             legal = true;
                     }
                     if(!legal)
                         return false;
                 }
-                if(c[i][j] != ' ' && (i == 0 || c[i - 1][j] == ' ') && !(i == c.length - 1 || c[i + 1][j] == ' '))
+                if(c[i][j] != ' ' && (i == 0 || c[i - 1][j] == ' ') && !(i == c.length - 1 || c[i + 1][j] == ' ')) //everything is the same as before but with down instead of across
                 {
                     String w = compileWord(c, i, j, false);
                     boolean legal = false;
@@ -399,14 +388,14 @@ public class Main
     public static String compileWord(char[][] c, int i, int j, boolean across) //combines characters starting at i,j to create word for legal check
     {
         String word = "";
-        while((i < c.length && j < c[i].length) && c[i][j] != ' ')
+        while((i < c.length && j < c[i].length) && c[i][j] != ' ') //keep moving until edge or empty space is hit
         {
             if(across)
             {
                 word += c[i][j];
                 j++;
             }
-            if(!across)
+            if(!across) //!across == down
             {
                 word += c[i][j];
                 i++;
@@ -438,7 +427,7 @@ public class Main
         return ret;
     }
 
-    public static MaskFormatter createFormatter(String s)
+    public static MaskFormatter createFormatter(String s) //used in the JFormattedTextField
     {
         MaskFormatter formatter = null;
         try
@@ -453,7 +442,7 @@ public class Main
         return formatter;
     }
 
-    public static class action implements ActionListener
+    public static class action implements ActionListener //used in the JButton
     {
         public void actionPerformed(ActionEvent ae)
         {

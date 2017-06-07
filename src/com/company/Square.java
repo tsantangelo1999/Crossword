@@ -10,7 +10,7 @@ public class Square
     public char letter;
     public char letterSolution;
 
-    public void update()
+    public void update() //this is called when the JButton is pressed
     {
         if(textField != null)
             letter = textField.getText().toLowerCase().charAt(0);
