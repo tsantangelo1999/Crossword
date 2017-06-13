@@ -1,0 +1,7 @@
+shapiro	last name of ben
+queen	female monarch title
+job	occupation
+
+squirrel	rodent that eats your flowers
+judge	presides over a court
+exception	thing that gets thrown when theres an error
